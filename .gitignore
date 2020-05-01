@@ -1,0 +1,12 @@
+﻿*obj/
+*bin/
+/packages
+/.vs
+/.sonarqube
+*.userprefs
+*.user
+*.UWP.nuget.*
+project.lock.json
+Resource.designer.cs
+/TestResults
+

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:behaviors="clr-namespace:Prism.Behaviors;assembly=Prism.Forms"
+             xmlns:cells="clr-namespace:TheMovie.Cells;assembly=TheMovie"
+             xmlns:converters="clr-namespace:TheMovie.Converters;assembly=TheMovie"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="TheMovie.Views.MainPage"
+             Title="{Binding Title}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ItemTappedEventArgsConverter x:Key="itemTappedEventArgsConverter" />
+            <converters:ItemVisibilityEventArgsConverter x:Key="itemAppearingEventArgsConverter" />
+            <converters:NegateBooleanConverter x:Key="inverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem             
+            AutomationId="Search"            
+            Text="Search"
+            Icon="ic_search_white.png" 
+            Command="{Binding ShowSearchMoviesCommand}"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <Frame IsVisible="{Binding IsConnected, Converter={StaticResource inverter}}">
+                <StackLayout>
+                    <Label
+                        Text="You need an internet connection. Check your connection and try again."                        
+                        HorizontalTextAlignment="Center"
+                        VerticalTextAlignment="Center"/>
+                    <Button
+                        Text="Try again"                        
+                        Command="{Binding LoadUpcomingMoviesCommand}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        WidthRequest="100"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"/>
+                </StackLayout>
+            </Frame>
+            <ListView 
+                x:Name="ItemsListView"                
+                BackgroundColor="{DynamicResource WindowBackground}"
+                IsVisible="{Binding IsConnected}"
+                ItemsSource="{Binding Movies}"
+                HasUnevenRows="true"
+                SeparatorVisibility="None"
+                RefreshCommand="{Binding LoadUpcomingMoviesCommand}"
+                IsPullToRefreshEnabled="true"
+                IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+                CachingStrategy="RecycleElement">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <cells:MovieCell/>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.Behaviors>
+                    <behaviors:EventToCommandBehavior 
+                        EventName="ItemTapped" 
+                        Command="{Binding ShowMovieDetailCommand}"
+                        EventArgsConverter="{StaticResource itemTappedEventArgsConverter}" />
+                    <behaviors:EventToCommandBehavior
+                        EventName="ItemAppearing" 
+                        Command="{Binding ItemAppearingCommand}"
+                        EventArgsConverter="{StaticResource itemAppearingEventArgsConverter}" />
+                </ListView.Behaviors>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
